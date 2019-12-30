@@ -22,9 +22,11 @@ import logging
 from PIL import Image, ImageOps
 from io import BytesIO
 import argparse
+import os
 
 import cv2
 import numpy as np
+import dlib
 
 from .PictureDimensions import PictureDimensions
 from .. import StateMachine
@@ -44,6 +46,11 @@ modules = (
     ('picamera', 'CameraPicamera', 'CameraPicamera'),
     ('dummy', 'CameraDummy', 'CameraDummy'))
 
+dirpath = os.getcwd()
+print("current directory is : " + dirpath)
+
+PREDICTOR_PATH = 'photobooth/models/shape_predictor_68_face_landmarks.dat'
+predictor = dlib.shape_predictor(PREDICTOR_PATH)
 
 class Camera:
 
@@ -176,7 +183,7 @@ class Camera:
 
         for bbox in faces:
 
-            points = np.asarray(face_points_detection(im, bbox))
+            points = np.asarray(face_points_detection(predictor, im, bbox))
 
             im_w, im_h = im.shape[:2]
             left, top = np.min(points, 0)

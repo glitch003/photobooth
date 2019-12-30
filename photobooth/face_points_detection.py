@@ -3,13 +3,11 @@ import dlib
 import numpy as np
 import os
 
-dirpath = os.getcwd()
-print("current directory is : " + dirpath)
 
-PREDICTOR_PATH = 'photobooth/models/shape_predictor_68_face_landmarks.dat'
-predictor = dlib.shape_predictor(PREDICTOR_PATH)
+
+
 ## Face and points detection
-def face_points_detection(img, bbox:dlib.rectangle):
+def face_points_detection(predictor, img, bbox:dlib.rectangle):
     # Get the landmarks/parts for the face in box d.
     shape = predictor(img, bbox)
 
