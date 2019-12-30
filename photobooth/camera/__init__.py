@@ -328,6 +328,8 @@ class Camera:
         dst_img = cv2.imread('./destination.jpg')
         dst_points_and_stuff = self.get_uhh_points_of_faces(dst_img)
 
+        rint("Got points of dst in {} seconds".format(time.time() - start_time))
+
         image_pairs = []
 
         # swap faces
@@ -336,6 +338,7 @@ class Camera:
             src_img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
             src_points_and_stuff = self.get_uhh_points_of_faces(src_img)
             print("Found {} src and {} dst images".format(len(src_points_and_stuff), len(dst_points_and_stuff)))
+            rint("Got points of src in {} seconds".format(time.time() - start_time))
 
             output = dst_img.copy()
 
@@ -368,10 +371,11 @@ class Camera:
         printer_output = np.vstack([
             printer_row, printer_row
         ])
-
+        rint("Rotated printer image in {} seconds".format(time.time() - start_time))
         cv2_im = cv2.cvtColor(printer_output,cv2.COLOR_BGR2RGB)
         picture = Image.fromarray(cv2_im)#.rotate(270, expand=True)
         picture.save('/tmp/printme.jpg', format='jpeg')
+        rint("Saved printer file in {} seconds".format(time.time() - start_time))
 
 
         final_output = np.hstack([

@@ -227,10 +227,10 @@ class PyQt5Gui(GuiSkeleton):
             review_time,
             lambda: self._comm.send(Workers.MASTER, GuiEvent('postprocess')))
 
-        # self._postprocess.do(self._picture)
+        self._postprocess.do(self._picture)
         # print special printed layout
-        qtprinterpic = ImageQt.ImageQt(Image.open('/tmp/printme.jpg'))
-        self._postprocess.do(qtprinterpic)
+        # qtprinterpic = ImageQt.ImageQt(Image.open('/tmp/printme.jpg'))
+        # self._postprocess.do(qtprinterpic)
 
     def showPostprocess(self, state):
 

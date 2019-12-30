@@ -51,6 +51,8 @@ class PrinterPyQt5(Printer):
             self._printer.setOutputFileName('print_%d.pdf' % self._counter)
             self._counter += 1
 
+        picture = ImageQt.ImageQt(Image.open('/tmp/printme.jpg'))
+
         print('Printing picture')
         print('Page Size: {}, Print Size: {}, PictureSize: {} '.format(
             self._printer.paperRect(), self._printer.pageRect(),
