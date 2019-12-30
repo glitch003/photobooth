@@ -48,7 +48,7 @@ class CameraPicamera(CameraInterface):
     def setActive(self):
 
         if self._cap is None or self._cap.closed:
-            self._cap = PiCamera(sensor_mode=1, framerate=(1, 6))
+            self._cap = PiCamera(sensor_mode=2, framerate=(1, 6))
             self._cap.resolution = (1920, 1080)
 
     def setIdle(self):
