@@ -323,17 +323,11 @@ class Camera:
         return cv2.flip(out,flipCode=0)
 
     def get_random_faces(self, n):
-        all_faces = glob.glob("../extracted/*.png")
+        all_faces = glob.glob("../extracted_points/*.pkl")
         faces = []
         for i in range(n):
-            new_face = [0,0]
-            # one at a time
-            while len(new_face) != 1:
-                face_filename = random.choice(all_faces)
-                # face_filename = "../bad_extracted_faces/0983930.png"
-                print("Using face filename {} for index {}".format(face_filename, i))
-                src_img = cv2.imread(face_filename)
-                new_face = self.get_uhh_points_of_faces(src_img, filename=face_filename)
+            filename = random.choice(all_faces)
+            new_face = pickle.load( open( filename, "rb" ) )
             faces += new_face
 
         return faces
