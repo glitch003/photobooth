@@ -20,15 +20,11 @@ def bilinear_interpolate(img, coords):
     # print("img.shape: {}".format(img.shape))
     # print("coords: {}".format(int_coords))
 
-    try:
-        # 4 Neighour pixels
-        q11 = img[y0, x0]
-        q21 = img[y0, x0 + 1]
-        q12 = img[y0 + 1, x0]
-        q22 = img[y0 + 1, x0 + 1]
-    except IndexError:
-        return img
-
+    # 4 Neighour pixels
+    q11 = img[y0, x0]
+    q21 = img[y0, x0 + 1]
+    q12 = img[y0 + 1, x0]
+    q22 = img[y0 + 1, x0 + 1]
 
     btm = q21.T * dx + q11.T * (1 - dx)
     top = q22.T * dx + q12.T * (1 - dx)
