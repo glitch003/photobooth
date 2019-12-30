@@ -297,6 +297,17 @@ class Camera:
             self._comm.send(Workers.MASTER,
                             StateMachine.CameraEvent('assemble'))
 
+    def rotateCvImg(self, img):
+        out = cv2.transpose(img)
+        return cv2.flip(out,flipCode=0)
+    # def rotateCvImg(self, img, deg):
+    #     (h, w) = img.shape[:2]
+    #     # calculate the center of the image
+    #     center = (w / 2.0, h / 2.0)
+    #     # rotate images for printer
+    #     M = cv2.getRotationMatrix2D(center, deg, 1.0)
+    #     return cv2.warpAffine(img, M, (h, w))
+
     def assemblePicture(self):
 
         self.setIdle()
@@ -326,10 +337,29 @@ class Camera:
                 print("swapping src face index {} into dst face index {}".format(i,i))
                 output = self.face_swap_stuff(src_points_and_stuff[i], dst_points_and_stuff[i], output)
 
-            image_pairs.append(np.vstack([src_img, output]))
+            image_pairs.append([src_img, output])
+
+        watermark = cv2.imread('./watermark.jpg')
+        printer_row = np.hstack([
+            self.rotateCvImg(image_pairs[0][0]),
+            self.rotateCvImg(image_pairs[0][1]),
+            self.rotateCvImg(image_pairs[1][0]),
+            self.rotateCvImg(image_pairs[1][1]),
+            self.rotateCvImg(watermark)
+        ])
+        printer_output = np.vstack([
+            printer_row, printer_row
+        ])
+
+        cv2_im = cv2.cvtColor(printer_output,cv2.COLOR_BGR2RGB)
+        picture = Image.fromarray(cv2_im)#.rotate(270, expand=True)
+        picture.save('/tmp/printme.jpg', format='jpeg')
 
 
-        final_output = np.hstack([image_pairs[0], image_pairs[1]])
+        final_output = np.hstack([
+            np.vstack([image_pairs[0][0], image_pairs[0][1]]),
+            np.vstack([image_pairs[1][0], image_pairs[1][1]])
+        ])
 
         cv2_im = cv2.cvtColor(final_output,cv2.COLOR_BGR2RGB)
         picture = Image.fromarray(cv2_im)

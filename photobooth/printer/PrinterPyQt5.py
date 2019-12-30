@@ -37,7 +37,7 @@ class PrinterPyQt5(Printer):
                                                   QtGui.QPageSize.Millimeter))
         self._printer.setColorMode(QPrinter.Color)
 
-        logging.info('Using printer "%s"', self._printer.printerName())
+        print('Using printer "%s"', self._printer.printerName())
 
         self._print_pdf = print_pdf
         if self._print_pdf:
@@ -51,10 +51,14 @@ class PrinterPyQt5(Printer):
             self._printer.setOutputFileName('print_%d.pdf' % self._counter)
             self._counter += 1
 
-        logging.info('Printing picture')
-        logging.debug('Page Size: {}, Print Size: {}, PictureSize: {} '.format(
+        print('Printing picture')
+        print('Page Size: {}, Print Size: {}, PictureSize: {} '.format(
             self._printer.paperRect(), self._printer.pageRect(),
             picture.rect()))
+        print("Aspect ratio of paper: {} and ratio of photo: {}".format(
+            self._printer.paperRect().width() / self._printer.paperRect().height(),
+            picture.rect().width() / picture.rect().height()
+        ))
 
         painter = QtGui.QPainter(self._printer)
         painter.drawImage(self._printer.pageRect(), picture, picture.rect())

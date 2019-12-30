@@ -184,7 +184,7 @@ class CameraEvent(Event):
 
     @property
     def picture(self):
-
+        print("Called CameraEvent picture")
         return self._picture
 
 

@@ -217,15 +217,20 @@ class PyQt5Gui(GuiSkeleton):
         self._setWidget(Frames.WaitMessage(_('Processing picture...')))
 
     def showReview(self, state):
-
+        print("Getting picture for review")
         picture = Image.open(state.picture)
+        print("got picture for review")
         self._picture = ImageQt.ImageQt(picture)
         review_time = self._cfg.getInt('Photobooth', 'display_time') * 1000
         self._setWidget(Frames.PictureMessage(self._picture))
         QtCore.QTimer.singleShot(
             review_time,
             lambda: self._comm.send(Workers.MASTER, GuiEvent('postprocess')))
-        self._postprocess.do(self._picture)
+
+        # self._postprocess.do(self._picture)
+        # print special printed layout
+        qtprinterpic = ImageQt.ImageQt(Image.open('/tmp/printme.jpg'))
+        self._postprocess.do(qtprinterpic)
 
     def showPostprocess(self, state):
 
