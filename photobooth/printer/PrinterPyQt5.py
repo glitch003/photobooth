@@ -22,6 +22,8 @@ import logging
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtPrintSupport import QPrinter
 
+from PIL import Image, ImageQt
+
 from . import Printer
 
 

@@ -38,6 +38,8 @@ from ..face_detection import face_detection
 from ..face_points_detection import face_points_detection
 from ..face_swap import warp_image_2d, warp_image_3d, mask_from_points, apply_mask, correct_colours, transformation_from_points
 
+import pickle
+
 # Available camera modules as tuples of (config name, module name, class name)
 modules = (
     ('python-gphoto2', 'CameraGphoto2', 'CameraGphoto2'),
@@ -51,8 +53,13 @@ modules = (
 dirpath = os.getcwd()
 print("current directory is : " + dirpath)
 
+# preload stuff
 PREDICTOR_PATH = 'photobooth/models/shape_predictor_68_face_landmarks.dat'
 predictor = dlib.shape_predictor(PREDICTOR_PATH)
+
+
+dst_img = cv2.imread('./destination.jpg')
+dst_points_and_stuff = pickle.load( open( "dst_points_and_stuff.pkl", "rb" ) )
 
 class Camera:
 
@@ -325,8 +332,10 @@ class Camera:
 
         picture = self._template.copy()
 
-        dst_img = cv2.imread('./destination.jpg')
-        dst_points_and_stuff = self.get_uhh_points_of_faces(dst_img)
+
+        # dst_points_and_stuff = self.get_uhh_points_of_faces(dst_img)
+
+        # pickle.dump( dst_points_and_stuff, open("dst_points_and_stuff.pkl", "wb") )
 
         print("Got points of dst in {} seconds".format(time.time() - start_time))
 
