@@ -29,6 +29,8 @@ import numpy as np
 import dlib
 
 import time
+import glob
+import random
 
 from .PictureDimensions import PictureDimensions
 from .. import StateMachine
@@ -58,8 +60,8 @@ PREDICTOR_PATH = 'photobooth/models/shape_predictor_68_face_landmarks.dat'
 predictor = dlib.shape_predictor(PREDICTOR_PATH)
 
 
-dst_img = cv2.imread('./destination.jpg')
-dst_points_and_stuff = pickle.load( open( "dst_points_and_stuff.pkl", "rb" ) )
+# dst_img = cv2.imread('./destination.jpg')
+# dst_points_and_stuff = pickle.load( open( "dst_points_and_stuff.pkl", "rb" ) )
 
 detector = dlib.get_frontal_face_detector()
 
@@ -96,7 +98,7 @@ class Camera:
 
         parser = argparse.ArgumentParser(description='FaceSwapApp')
         parser.add_argument('--warp_2d', default=False, action='store_true', help='2d or 3d warp')
-        parser.add_argument('--correct_color', default=False, action='store_true', help='Correct color')
+        parser.add_argument('--correct_color', default=True, action='store_true', help='Correct color')
         parser.add_argument('--no_debug_window', default=True, action='store_true', help='Don\'t show debug window')
         parser.add_argument('--shuffle', default=False, action='store_true', help='Shuffle face order')
         args = parser.parse_args()
@@ -155,7 +157,7 @@ class Camera:
         return output
 
 
-    def get_uhh_points_of_faces(self, im, r=10):
+    def get_uhh_points_of_faces(self, im, r=10, filename=""):
         faces = face_detection(detector, im)
 
         if len(faces) == 0:
@@ -206,7 +208,8 @@ class Camera:
             all_points.append({
                 'points': points - np.asarray([[x, y]]),
                 'shape': (x, y, w, h),
-                'face': im[y:y+h, x:x+w]
+                'face': im[y:y+h, x:x+w],
+                'filename': filename
             })
 
         return all_points
@@ -318,13 +321,22 @@ class Camera:
     def rotateCvImg(self, img):
         out = cv2.transpose(img)
         return cv2.flip(out,flipCode=0)
-    # def rotateCvImg(self, img, deg):
-    #     (h, w) = img.shape[:2]
-    #     # calculate the center of the image
-    #     center = (w / 2.0, h / 2.0)
-    #     # rotate images for printer
-    #     M = cv2.getRotationMatrix2D(center, deg, 1.0)
-    #     return cv2.warpAffine(img, M, (h, w))
+
+    def get_random_faces(self, n):
+        all_faces = glob.glob("../extracted/*.png")
+        faces = []
+        for i in range(n):
+            new_face = [0,0]
+            # one at a time
+            while len(new_face) != 1:
+                face_filename = random.choice(all_faces)
+                # face_filename = "../bad_extracted_faces/0983930.png"
+                print("Using face filename {} for index {}".format(face_filename, i))
+                src_img = cv2.imread(face_filename)
+                new_face = self.get_uhh_points_of_faces(src_img, filename=face_filename)
+            faces += new_face
+
+        return faces
 
     def assemblePicture(self):
 
@@ -339,21 +351,24 @@ class Camera:
 
         # pickle.dump( dst_points_and_stuff, open("dst_points_and_stuff.pkl", "wb") )
 
-        print("Got points of dst in {} seconds".format(time.time() - start_time))
+        print("Copied template in {} seconds".format(time.time() - start_time))
 
         image_pairs = []
 
         # swap faces
         for i in range(2):
             pil_image = Image.open(self._pictures[i])
-            src_img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
-            src_points_and_stuff = self.get_uhh_points_of_faces(src_img)
-            print("Found {} src and {} dst images".format(len(src_points_and_stuff), len(dst_points_and_stuff)))
-            print("Got points of src in {} seconds".format(time.time() - start_time))
+            dst_img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+            dst_points_and_stuff = self.get_uhh_points_of_faces(dst_img)
+            print("Found {} dst images".format(len(dst_points_and_stuff)))
+            print("Got points of dst in {} seconds".format(time.time() - start_time))
 
             output = dst_img.copy()
 
-            faces_to_clone = len(src_points_and_stuff)
+            faces_to_clone = len(dst_points_and_stuff)
+            src_points_and_stuff = self.get_random_faces(faces_to_clone)
+
+            print("Got points of src in {} seconds".format(time.time() - start_time))
 
             if len(dst_points_and_stuff) < len(src_points_and_stuff):
                 faces_to_clone = len(dst_points_and_stuff)
@@ -362,21 +377,40 @@ class Camera:
                 print("swapping src face index {} into dst face index {}".format(i,i))
                 output = self.face_swap_stuff(src_points_and_stuff[i], dst_points_and_stuff[i], output)
 
-            image_pairs.append([src_img, output])
+            # New 1920 x 100 image
+            text_img = np.zeros((424, 1920, 3), np.uint8)
+            # Fill image with white color
+            text_img[:] = (255, 255, 255)
+
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            thickness = 10
+
+            text_to_write = "You have been replaced by AI:"
+            print("Writing text {}".format(text_to_write))
+            cv2.putText(text_img, text_to_write,(100,150), font, 3, (0,0,0),thickness,cv2.LINE_AA)
+
+            thickness = 8
+            text_to_write = ", ".join(map(lambda x: os.path.basename(x['filename']), src_points_and_stuff))
+            print("Writing text {}".format(text_to_write))
+            cv2.putText(text_img, text_to_write,(100,275), font, 2, (0,0,0),thickness,cv2.LINE_AA)
+
+            image_pairs.append([dst_img, output, text_img])
 
         watermark = cv2.imread('./watermark.jpg')
-        # printer_row = np.hstack([
-        #     self.rotateCvImg(image_pairs[0][0]),
-        #     self.rotateCvImg(image_pairs[0][1]),
-        #     self.rotateCvImg(image_pairs[1][0]),
-        #     self.rotateCvImg(image_pairs[1][1]),
-        #     self.rotateCvImg(watermark)
-        # ])
+
+        # # New 1920 x 150 image
+        # white_border = np.zeros((100, 1920, 3), np.uint8)
+        # # Fill image with white color
+        # white_border[:] = (255, 255, 255)
+
+
         printer_row = self.rotateCvImg(np.vstack([
             image_pairs[0][0],
             image_pairs[0][1],
+            image_pairs[0][2],
             image_pairs[1][0],
             image_pairs[1][1],
+            image_pairs[1][2],
             watermark
         ]))
         printer_output = np.vstack([
