@@ -28,6 +28,8 @@ import cv2
 import numpy as np
 import dlib
 
+import time
+
 from .PictureDimensions import PictureDimensions
 from .. import StateMachine
 from ..Threading import Workers
@@ -149,7 +151,7 @@ class Camera:
 
         if len(faces) == 0:
             print('Detect 0 Face !!!')
-            exit(-1)
+            return []
 
         # uncomment this to make the face selector window show up
         # if len(faces) == 1:
@@ -317,6 +319,8 @@ class Camera:
 
     def assemblePicture(self):
 
+        start_time = time.time()
+
         self.setIdle()
 
         picture = self._template.copy()
@@ -378,7 +382,7 @@ class Camera:
         cv2_im = cv2.cvtColor(final_output,cv2.COLOR_BGR2RGB)
         picture = Image.fromarray(cv2_im)
 
-
+        print("Assembled in {} seconds".format(time.time() - start_time))
 
 
         # for i in range(4):
