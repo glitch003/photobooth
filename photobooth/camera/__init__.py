@@ -340,13 +340,20 @@ class Camera:
             image_pairs.append([src_img, output])
 
         watermark = cv2.imread('./watermark.jpg')
-        printer_row = np.hstack([
-            self.rotateCvImg(image_pairs[0][0]),
-            self.rotateCvImg(image_pairs[0][1]),
-            self.rotateCvImg(image_pairs[1][0]),
-            self.rotateCvImg(image_pairs[1][1]),
-            self.rotateCvImg(watermark)
-        ])
+        # printer_row = np.hstack([
+        #     self.rotateCvImg(image_pairs[0][0]),
+        #     self.rotateCvImg(image_pairs[0][1]),
+        #     self.rotateCvImg(image_pairs[1][0]),
+        #     self.rotateCvImg(image_pairs[1][1]),
+        #     self.rotateCvImg(watermark)
+        # ])
+        printer_row = self.rotateCvImg(np.vstack([
+            image_pairs[0][0],
+            image_pairs[0][1],
+            image_pairs[1][0],
+            image_pairs[1][1],
+            watermark
+        ]))
         printer_output = np.vstack([
             printer_row, printer_row
         ])
