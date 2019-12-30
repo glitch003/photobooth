@@ -53,9 +53,9 @@ class CameraPicamera(CameraInterface):
 
     def setIdle(self):
 
-        if self._cap is not None and not self._cap.closed:
-            self._cap.close()
-            self._cap = None
+        # if self._cap is not None and not self._cap.closed:
+            # self._cap.close()
+            # self._cap = None
 
     def getPreview(self):
 
