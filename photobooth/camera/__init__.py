@@ -61,6 +61,8 @@ predictor = dlib.shape_predictor(PREDICTOR_PATH)
 dst_img = cv2.imread('./destination.jpg')
 dst_points_and_stuff = pickle.load( open( "dst_points_and_stuff.pkl", "rb" ) )
 
+detector = dlib.get_frontal_face_detector()
+
 class Camera:
 
     def __init__(self, config, comm, CameraModule):
@@ -154,7 +156,7 @@ class Camera:
 
 
     def get_uhh_points_of_faces(self, im, r=10):
-        faces = face_detection(im)
+        faces = face_detection(detector, im)
 
         if len(faces) == 0:
             print('Detect 0 Face !!!')
