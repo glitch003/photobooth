@@ -33,7 +33,7 @@ class CameraDummy(CameraInterface):
 
         self.hasPreview = True
         self.hasIdle = False
-        self._size = (1920, 1280)
+        self._size = (1920, 1080)
 
         self._hue = 0
 
@@ -47,5 +47,6 @@ class CameraDummy(CameraInterface):
 
         self._hue = (self._hue + 1) % 360
         r, g, b = hsv_to_rgb(self._hue / 360, .2, .9)
-        return Image.new('RGB', self._size, (int(r * 255), int(g * 255),
-                                             int(b * 255)))
+        return Image.open('/Users/chris/Documents/WorkStuff/phot-a-boo/FaceSwap/original_snowball.jpg')
+        # return Image.new('RGB', self._size, (int(r * 255), int(g * 255),
+                                             # int(b * 255)))

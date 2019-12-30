@@ -41,6 +41,13 @@ from .worker import Worker
 # Globally install gettext for I18N
 gettext.install('photobooth', 'photobooth/locale')
 
+try:
+    # the one-time setting of multiprocessing start method,
+    # if supported, set to spawn to avoid Qt issues
+    mp.set_start_method('spawn')
+except:
+    pass
+
 
 class CameraProcess(mp.Process):
 
