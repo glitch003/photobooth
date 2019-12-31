@@ -383,10 +383,15 @@ class Camera:
             print("Writing text {}".format(text_to_write))
             cv2.putText(text_img, text_to_write,(100,150), font, 3, (0,0,0),thickness,cv2.LINE_AA)
 
-            thickness = 8
+            thickness = 7
             text_to_write = ", ".join(map(lambda x: os.path.basename(x['filename']), src_points_and_stuff))
             print("Writing text {}".format(text_to_write))
             cv2.putText(text_img, text_to_write,(100,275), font, 2, (0,0,0),thickness,cv2.LINE_AA)
+
+            thickness = 7
+            text_to_write = "Welcome to the future"
+            print("Writing text {}".format(text_to_write))
+            cv2.putText(text_img, text_to_write,(100,375), font, 2, (0,0,0),thickness,cv2.LINE_AA)
 
             image_pairs.append([dst_img, output, text_img])
 
