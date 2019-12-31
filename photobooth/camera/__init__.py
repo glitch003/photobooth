@@ -101,6 +101,7 @@ class Camera:
         parser.add_argument('--correct_color', default=True, action='store_true', help='Correct color')
         parser.add_argument('--no_debug_window', default=True, action='store_true', help='Don\'t show debug window')
         parser.add_argument('--shuffle', default=False, action='store_true', help='Shuffle face order')
+        parser.add_argument('--run', default=False, action='store_true', help='Do nothing')
         args = parser.parse_args()
 
         src_points = src_stuff['points']
