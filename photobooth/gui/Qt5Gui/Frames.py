@@ -85,7 +85,7 @@ class IdleMessage(QtWidgets.QFrame):
         self.setObjectName('IdleMessage')
 
         self._message_label = _('Hit the')
-        self._message_button = _('Button!')
+        self._message_button = 'Spacebar'
 
         self.initFrame(trigger_action)
 
